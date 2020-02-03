@@ -37,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineStore.DAL", "Services
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineStore.Infrastructure", "Services\OnlineStore\OnlineStore.Infrastructure\OnlineStore.Infrastructure.csproj", "{5EEDFBF9-9C2A-4D75-BB1B-38ACAC260679}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatRoom.Infrastructure", "Services\ChatRoom\ChatRoom.Infrastructure\ChatRoom.Infrastructure.csproj", "{5372E597-7231-4F13-B214-1BAC02A9EFE6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatRoom.Infrastructure", "Services\ChatRoom\ChatRoom.Infrastructure\ChatRoom.Infrastructure.csproj", "{5372E597-7231-4F13-B214-1BAC02A9EFE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
