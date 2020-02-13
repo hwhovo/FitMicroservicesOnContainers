@@ -14,12 +14,28 @@ using OnlineStore.Core.Models;
 using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 
 namespace OnlineStore.Infrastructure
 {
     public static class EventBusConfiguration
     {
+        public static string GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return ip.ToString();
+                }
+            }
+            throw new Exception("No network adapters with an IPv4 address in the system!");
+        }
+
         public static void AddEventBus(this IServiceCollection services, IConfiguration configuration)
         {
             var eventBusConfigurationSection = configuration.GetSection(StartupConfigurations.EventBusConfiguration.ToString());
@@ -28,13 +44,21 @@ namespace OnlineStore.Infrastructure
             var eventBusConfiguration = eventBusConfigurationSection.Get<EventBusConfigurationModel>();
             var retryCount = eventBusConfiguration.RetryCount ?? 5;
 
+            
             services.AddSingleton<IRabbitMQPersistentConnection>(sp =>
             {
                 var logger = sp.GetRequiredService<ILogger<DefaultRabbitMQPersistentConnection>>();
+
+                logger.LogError(eventBusConfiguration.HostName);
+                logger.LogError(eventBusConfiguration.UserName);
+                logger.LogError(eventBusConfiguration.Password);
+                logger.LogError(eventBusConfiguration.VirtualHost);
+                logger.LogError("IP: " + GetLocalIPAddress());
+
                 var factory = new ConnectionFactory()
                 {
                     HostName = eventBusConfiguration.HostName ?? throw new LogicException(ExceptionMessage.MANDATORY_PROPERTY_IS_NULL, nameof(eventBusConfiguration.HostName)),
-                    //DispatchConsumersAsync = true
+                    // DispatchConsumersAsync = true,
                     VirtualHost = eventBusConfiguration.VirtualHost ?? throw new LogicException(ExceptionMessage.MANDATORY_PROPERTY_IS_NULL, nameof(eventBusConfiguration.HostName)),
                     UserName = eventBusConfiguration.UserName,
                     Password = eventBusConfiguration.Password,

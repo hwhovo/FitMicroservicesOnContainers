@@ -1,0 +1,64 @@
+version: '3.4'
+
+#networks:
+#  localdev:
+#    name: localdev
+
+services:
+  chat_room_api:
+    image: ${REGISTRY:-chat-room}/chat_room_api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: ./Services/ChatRoom/ChatRoom/Dockerfile
+    restart: on-failure
+    ports:
+    - "4641:4641"
+    depends_on:
+    - rabbitmq
+    - sqlserver
+#    networks:
+#      - localdev
+
+  online-store-api:
+    image: ${REGISTRY:-online-store}/online-store-api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: ./Services/OnlineStore/OnlineStore.API/Dockerfile
+    restart: on-failure
+    ports:
+      - "8000:8000"
+      - "5401:5401"
+    depends_on:
+    - rabbitmq
+    - sqlserver
+#    networks:
+#      - localdev
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    container_name: rabbitmq
+    hostname: rabbitmq
+    labels:
+      NAME: "rabbitmq"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+#    networks:
+#      - localdev
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    ports:
+      - "1433:1433"
+    container_name: sqlserver
+    environment:
+        SA_PASSWORD: "Hw123456"
+        ACCEPT_EULA: "Y"
+    hostname: sqlserver
+#    networks:
+#      - localdev

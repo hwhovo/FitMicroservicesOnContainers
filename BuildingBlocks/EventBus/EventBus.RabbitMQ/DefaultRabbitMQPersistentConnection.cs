@@ -51,7 +51,7 @@ namespace EventBus.RabbitMQ
 
         public void Dispose()
         {
-            if (_disposed) return;
+            if (_disposed || _connection == null) return;
 
             _disposed = true;
 

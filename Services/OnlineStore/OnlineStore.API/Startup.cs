@@ -2,16 +2,21 @@
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using OnlineStore.API.ErrorHandling;
 using OnlineStore.Core.Enums;
+using OnlineStore.Core.Models.HealthCheck;
 using OnlineStore.DAL;
 using OnlineStore.Infrastructure;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
+using System.Linq;
 
 namespace OnlineStore.API
 {
@@ -54,6 +59,28 @@ namespace OnlineStore.API
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseMiddleware<ErrorHandlingMiddleware>();
+
+            //app.UseHealthChecks("/health", new HealthCheckOptions
+            //{
+            //    ResponseWriter = async (context, report) =>
+            //    {
+            //        context.Response.ContentType = "application/json";
+
+            //        var response = new HealthCheckResponseModel
+            //        {
+            //            Status = report.Status.ToString(),
+            //            Checks = report.Entries.Select(x => new HealthCheckModel
+            //            {
+            //                Component = x.Key,
+            //                Status = x.Value.Status.ToString(),
+            //                Description = x.Value.Description
+            //            }),
+            //            Duration = report.TotalDuration
+            //        };
+
+            //        await context.Response.WriteAsync(JsonConvert.SerializeObject(response));
+            //    }
+            //});
 
             app.UseCors(x => x
                 .AllowAnyOrigin()
