@@ -14,7 +14,7 @@ jobs:
     - name: Build and push image to ACR
       id: build-image
       run: |
-        docker build "$GITHUB_WORKSPACE/services/chatroom/chatroom/" -f  "services/chatroom/chatroom/dockerfile" -t fitmicroservicesoncontainersacr.azurecr.io/fitcluster:${{ github.sha }}
+        docker build "$GITHUB_WORKSPACE/services/chatroom/chatroom/" -f  "dockerfile" -t fitmicroservicesoncontainersacr.azurecr.io/fitcluster:${{ github.sha }}
         docker push fitmicroservicesoncontainersacr.azurecr.io/fitcluster:${{ github.sha }}
     
     - uses: azure/k8s-set-context@v1
