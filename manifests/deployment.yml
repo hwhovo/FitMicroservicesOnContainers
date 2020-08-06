@@ -1,0 +1,16 @@
+apiVersion : apps/v1beta1
+kind: Deployment
+metadata:
+  name: "fitcluster"
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: "fitcluster"
+    spec:
+      containers:
+        - name: "fitcluster"
+          image: "fitmicroservicesoncontainersacr.azurecr.io/fitcluster"
+          ports:
+          - containerPort: 4641

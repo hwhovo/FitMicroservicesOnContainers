@@ -1,0 +1,50 @@
+on: [push]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    
+    - uses: azure/docker-login@v1
+      with:
+        login-server: fitmicroservicesoncontainersacr.azurecr.io
+        username: ${{ secrets.acr_fitmicroservicesoncontainersacr_username }}
+        password: ${{ secrets.acr_fitmicroservicesoncontainersacr_password }}
+    
+    - name: Build and push image to ACR
+      id: build-image
+      run: |
+        docker build "$GITHUB_WORKSPACE/services/chatroom/chatroom/" -f  "dockerfile" -t fitmicroservicesoncontainersacr.azurecr.io/fitcluster:${{ github.sha }}
+        docker push fitmicroservicesoncontainersacr.azurecr.io/fitcluster:${{ github.sha }}
+    
+    - uses: azure/k8s-set-context@v1
+      with:
+         kubeconfig: ${{ secrets.aks_fitcluster_kubeConfig }}
+      id: login
+    
+    - name: Create namespace
+      run: |
+        namespacePresent=`kubectl get namespace | grep fitclusterd4ee | wc -l`
+        if [ $namespacePresent -eq 0 ]
+        then
+            echo `kubectl create namespace fitclusterd4ee`
+        fi
+
+    - uses: azure/k8s-create-secret@v1
+      with:
+        namespace: fitclusterd4ee
+        container-registry-url: fitmicroservicesoncontainersacr.azurecr.io
+        container-registry-username: ${{ secrets.acr_fitmicroservicesoncontainersacr_username }}
+        container-registry-password: ${{ secrets.acr_fitmicroservicesoncontainersacr_password }}
+        secret-name: fitclusterdockerauth
+       
+    - uses: azure/k8s-deploy@v1
+      with:
+        namespace: fitclusterd4ee
+        manifests: |
+          manifests/deployment.yml
+          manifests/service.yml
+        images: |
+          fitmicroservicesoncontainersacr.azurecr.io/fitcluster:${{ github.sha }}
+        imagepullsecrets: |
+          fitclusterdockerauth
