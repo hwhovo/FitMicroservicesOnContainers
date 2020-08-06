@@ -66,27 +66,6 @@ namespace OnlineStore.API
         {
             app.UseMiddleware<ErrorHandlingMiddleware>();
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();
-            //app.UseHealthChecks("/health", new HealthCheckOptions
-            //{
-            //    ResponseWriter = async (context, report) =>
-            //    {
-            //        context.Response.ContentType = "application/json";
-
-            //        var response = new HealthCheckResponseModel
-            //        {
-            //            Status = report.Status.ToString(),
-            //            Checks = report.Entries.Select(x => new HealthCheckModel
-            //            {
-            //                Component = x.Key,
-            //                Status = x.Value.Status.ToString(),
-            //                Description = x.Value.Description
-            //            }),
-            //            Duration = report.TotalDuration
-            //        };
-
-            //        await context.Response.WriteAsync(JsonConvert.SerializeObject(response));
-            //    }
-            //});
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
