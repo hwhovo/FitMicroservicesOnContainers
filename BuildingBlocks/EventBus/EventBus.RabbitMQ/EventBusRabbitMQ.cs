@@ -186,7 +186,7 @@ namespace EventBus.RabbitMQ
             consumer.Received += async (model, ea) =>
             {
                 var eventName = ea.RoutingKey;
-                var message = Encoding.UTF8.GetString(ea.Body);
+                var message = Encoding.UTF8.GetString(ea.Body.ToArray());
 
                 await ProcessEvent(eventName, message);
 
@@ -217,13 +217,12 @@ namespace EventBus.RabbitMQ
                     {
                         if (subscription.IsDynamic)
                         {
-                            var handler = scope.ResolveOptional(subscription.HandlerType) as IDynamicIntegrationEventHandler;
-                            if (handler == null)
+                            if (!(scope.ResolveOptional(subscription.HandlerType) is IDynamicIntegrationEventHandler handler))
                             {
                                 continue;
                             }
 
-                            dynamic eventData = JObject.Parse(message);
+                            var eventData = JObject.Parse(message);
 
                             await Task.Yield();
                             await handler.Handle(eventData);

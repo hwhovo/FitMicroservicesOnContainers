@@ -1,26 +1,19 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using ChatRoom.API.ErrorHandling;
+using ChatRoom.API.Middleware;
+using ChatRoom.Core.Enums;
+using ChatRoom.DAL;
+using ChatRoom.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using OnlineStore.Core.Enums;
-using OnlineStore.DAL;
-using Swashbuckle.AspNetCore.Swagger;
-using OnlineStore.Infrastructure;
-using AutoMapper;
-using OnlineStore.API.ErrorHandling;
 using Microsoft.OpenApi.Models;
 
-namespace OnlineStore.API
+namespace ChatRoom.API
 {
     public class Startup
     {
@@ -31,16 +24,15 @@ namespace OnlineStore.API
 
         public IConfiguration Configuration { get; }
         public ILifetimeScope AutofacContainer { get; private set; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions();
-            services.AddControllers();
 
+            services.AddControllers();
             services.AddCors();
 
-            services.AddDbContextPool<OnlineStoreContext>(options =>
+            services.AddDbContextPool<ChatRoomContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString(StartupConfigurations.DefaultConnection.ToString()), m => m.MigrationsAssembly(GetType().Namespace));
                 options.EnableSensitiveDataLogging(true);
@@ -51,11 +43,8 @@ namespace OnlineStore.API
                 c.SwaggerDoc("v1", new OpenApiInfo());
             });
 
-            services.AddAutoMapper(x => 
-            {
-                x.AddProfile<MappingProfile>();
-            });
             services.AddRepositoriesAndBussinesLayerServices();
+            services.AddMvc();
             services.AddJWTAuthentification(Configuration);
             services.AddEventBus(Configuration);
             services.AddEventBusServices();
@@ -64,29 +53,9 @@ namespace OnlineStore.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseMiddleware<ErrorHandlingMiddleware>();
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();
-            //app.UseHealthChecks("/health", new HealthCheckOptions
-            //{
-            //    ResponseWriter = async (context, report) =>
-            //    {
-            //        context.Response.ContentType = "application/json";
 
-            //        var response = new HealthCheckResponseModel
-            //        {
-            //            Status = report.Status.ToString(),
-            //            Checks = report.Entries.Select(x => new HealthCheckModel
-            //            {
-            //                Component = x.Key,
-            //                Status = x.Value.Status.ToString(),
-            //                Description = x.Value.Description
-            //            }),
-            //            Duration = report.TotalDuration
-            //        };
-
-            //        await context.Response.WriteAsync(JsonConvert.SerializeObject(response));
-            //    }
-            //});
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -94,7 +63,9 @@ namespace OnlineStore.API
                 c.SwaggerEndpoint($"/swagger/v1/swagger.json", "My API V1");
             });
             app.SeedData();
+            app.UseWebSockets();
             app.UseEventBusEvents();
+            app.UseMiddleware<WebSocketMiddleware>();
 
             app.UseRouting();
 

@@ -75,7 +75,8 @@ namespace OnlineStore.API
 
                 if (productJsonData.Any())
                 {
-                    var categories = _context.Categories.Where(category => productJsonData.Any(product => product.CategorySeederId == category.SeederId))
+                    var allCategories = _context.Categories.ToList();
+                    var categories = allCategories.Where(category => productJsonData.Any(product => product.CategorySeederId == category.SeederId))
                                                      .Select(category => new
                                                      {
                                                          category.Id,

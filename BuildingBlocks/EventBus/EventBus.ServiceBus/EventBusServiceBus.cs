@@ -171,8 +171,11 @@ namespace EventBus.ServiceBus
                         if (subscription.IsDynamic)
                         {
                             var handler = scope.ResolveOptional(subscription.HandlerType) as IDynamicIntegrationEventHandler;
+
                             if (handler == null) continue;
-                            dynamic eventData = JObject.Parse(message);
+
+                            var eventData = JObject.Parse(message);
+
                             await handler.Handle(eventData);
                         }
                         else

@@ -9,7 +9,7 @@ services:
     image: ${REGISTRY:-chat-room}/chat_room_api:${PLATFORM:-linux}-${TAG:-latest}
     build:
       context: .
-      dockerfile: ./Services/ChatRoom/ChatRoom/Dockerfile
+      dockerfile: ./Services/ChatRoom/ChatRoom.API/Dockerfile
     restart: on-failure
     ports:
     - "4641:4641"

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.6" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ChatRoom.BLL\ChatRoom.BLL.csproj" />
+    <ProjectReference Include="..\ChatRoom.Core\ChatRoom.Core.csproj" />
+    <ProjectReference Include="..\ChatRoom.DAL\ChatRoom.DAL.csproj" />
+    <ProjectReference Include="..\ChatRoom.Infrastructure\ChatRoom.Infrastructure.csproj" />
+  </ItemGroup>
+
+
+</Project>

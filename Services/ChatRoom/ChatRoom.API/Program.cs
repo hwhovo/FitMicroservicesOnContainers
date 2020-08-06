@@ -9,10 +9,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace OnlineStore.API
+namespace ChatRoom.API
 {
     public class Program
     {
+        public static readonly string Namespace = typeof(Program).Namespace;
+        public static readonly string AppName = Namespace;
+
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
@@ -25,7 +28,7 @@ namespace OnlineStore.API
                 {
                     webBuilder.UseKestrel(x =>
                     {
-                        x.ListenAnyIP(5401);
+                        x.ListenAnyIP(4641);
                     });
                     webBuilder.UseContentRoot(Directory.GetCurrentDirectory());
                     webBuilder.UseStartup<Startup>();
